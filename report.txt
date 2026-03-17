@@ -1,2 +1,21 @@
 I wrote my code myself. As such I will just document my testing here.
 
+Addition:
+
+Input           Expected Output         Output
+101 5 10        106                     106
+10 111 2        1001                    5
+111 10 2        1001                    5
+
+Thought I had managed alternate bases, but apparently not.
+I've now changed the way I was doing the carrying to actually function (I had forgotten to add the carry step), and made it so the final value is 
+in the original base.
+
+Input           Expected Output         Output
+101 5 10        106                     106
+10 111 2        1001                    1001
+111 10 2        1001                    1001
+243 1637 8      2102                    2102
+1 1 10          2                       2
+243 1523 6      2210                    2210
+0 0 2           0                       0
