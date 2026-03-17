@@ -32,3 +32,18 @@ Input           Expected Output         Output
 0 0 2           0 0                     0 0
 
 All of this is as expected.
+
+Division:
+
+Input           Expected Output         Output
+101 5 10        106 505 20              106 505
+10 111 2        1001 1110 0             1001 1110 0
+111 10 2        1001 1110 11            1001 1110 11
+243 1637 8      2102 447075 0           2102 447075 0
+1637 243 8      2102 447075 5           2102 447075 5
+1 1 10          2 1 1                   2 1 1
+243 1523 6      2210 512213 0           2210 512213 0
+1523 243 6      2210 512213 4           2210 512213 4
+0 0 2           0 0 0                   0 0 0
+
+All as expected. Returns 0 when dividing by 0.

@@ -3,6 +3,7 @@
 #include <algorithm>
 
 // School method for addition
+
 std::vector<int> additionVec(std::vector<int> one, std::vector<int> two, int base) {
     int n = std::max(one.size(), two.size());
 
@@ -27,7 +28,9 @@ std::vector<int> additionVec(std::vector<int> one, std::vector<int> two, int bas
     return result;
 }
 
-// Vector subtraction
+// Karatsuba multiplication
+
+// Vector subtraction (helper for multiplication)
 std::vector<int> sub(std::vector<int> a, std::vector<int> b, int base) {
     // ensuring that the bigger one is a
     if (b.size() > a.size()){
@@ -105,6 +108,64 @@ std::vector<int> karatsuba(std::vector<int> v1, std::vector<int> v2, int base) {
     return additionVec(z2, additionVec(middle, z0, base), base);
 }
 
+// School division
+
+// Helper function for determining equality
+bool isGreaterOrEqual(std::vector<int> a, std::vector<int> b) {
+    while (a.size() > 1 && a[0] == 0) a.erase(a.begin());
+    while (b.size() > 1 && b[0] == 0) b.erase(b.begin());
+    
+    if (a.size() != b.size()){
+        return a.size() > b.size();
+    }
+
+    for (int i = 0; i < a.size(); i++) {
+        if (a[i] != b[i]){
+            return a[i] > b[i];
+        }
+    }
+
+    // Equal case
+    return true;
+}
+
+// Division function
+std::vector<int> division(std::vector<int> dividend, std::vector<int> divisor, int base) {
+    // Divide by 0 case
+    if (divisor.size() == 1 && divisor[0] == 0) {
+        return {0}; 
+    }
+
+    std::vector<int> quotient;
+    std::vector<int> current_rem;
+
+    for (int i = 0; i < dividend.size(); i++) {
+        current_rem.push_back(dividend[i]);
+        
+        // Clear leading zeroes
+        while (current_rem.size() > 1 && current_rem[0] == 0) {
+            current_rem.erase(current_rem.begin());
+        }
+
+        // Find the quotient digit
+        int count = 0;
+        while (isGreaterOrEqual(current_rem, divisor)) {
+            current_rem = sub(current_rem, divisor, base);
+            count++;
+        }
+        quotient.push_back(count);
+    }
+
+    // Remove leading digits
+    while (quotient.size() > 1 && quotient[0] == 0) {
+        quotient.erase(quotient.begin());
+    }
+
+    return quotient;
+}
+
+// Main function
+
 int main() {
     long long i1, i2;
     int b;
@@ -129,6 +190,12 @@ int main() {
     std::cout << " ";
 
     res = karatsuba(v1, v2, b);
+    for (int i = 0; i < res.size(); i++){
+        std::cout << res[i];
+    }
+    std::cout << " ";
+
+    res = division(v1, v2, b);
     for (int i = 0; i < res.size(); i++){
         std::cout << res[i];
     }
