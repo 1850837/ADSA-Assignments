@@ -8,8 +8,8 @@ Input           Expected Output         Output
 111 10 2        1001                    5
 
 Thought I had managed alternate bases, but apparently not.
-I've now changed the way I was doing the carrying to actually function (I had forgotten to add the carry step), and made it so the final value is 
-in the original base.
+I've now changed the way I was doing the carrying to actually function (I had forgotten to add the carry step), 
+and made it so the final value is in the original base.
 
 Input           Expected Output         Output
 101 5 10        106                     106
