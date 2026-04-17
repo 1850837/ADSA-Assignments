@@ -4,7 +4,6 @@
 using namespace std;
 
 // === AVL NODE ===
-// untested
 
 class Node{
     private:
@@ -90,7 +89,6 @@ void input(vector<string>* values){
 }
 
 // === INSERT ===
-// untested
 // always returns the root
 Node* insert(Node* current, int key){
     
@@ -190,7 +188,7 @@ int main(){
     // inserting the insert vals (NOT FINAL don't do it this order)
     for (int i = 0; i < values.size(); i++){
         if (values[i][0] == 'A'){
-            insert(root, stoi(values[i].substr(1)));
+            root = insert(root, stoi(values[i].substr(1)));
         }
     }
 
