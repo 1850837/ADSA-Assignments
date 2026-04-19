@@ -200,13 +200,32 @@ Node* insert(Node* current, int key){
 }
 
 // === TRAVERSALS ===
-void traversalPre(Node* current){
+
+void preOrder(Node* current){
     if (current == nullptr){
         return;
     }
     cout << current->getKey() << " ";
-    traversalPre(current->getLeft());
-    traversalPre(current->getRight());
+    preOrder(current->getLeft());
+    preOrder(current->getRight());
+}
+
+void inOrder(Node* current){
+    if (current == nullptr){
+        return;
+    }
+    inOrder(current->getLeft());
+    cout << current->getKey() << " ";
+    inOrder(current->getRight());
+}
+
+void postOrder(Node* current){
+    if (current == nullptr){
+        return;
+    }
+    postOrder(current->getLeft());
+    postOrder(current->getRight());
+    cout << current->getKey() << " ";   
 }
 
 // === MAIN ===
@@ -231,7 +250,15 @@ int main(){
         }
     }
 
-    traversalPre(root);
+    if (values[values.size()-1] == "PRE"){
+        preOrder(root);
+    }
+    else if (values[values.size()-1] == "IN"){
+        inOrder(root);
+    }
+    else if (values[values.size()-1] == "POST"){
+        postOrder(root);
+    }
 
     return 0;
 }
