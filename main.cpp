@@ -1,6 +1,5 @@
 #include <iostream>
 #include <vector>
-
 using namespace std;
 
 // === AVL NODE ===
@@ -318,31 +317,37 @@ Node* deleteNode(Node* root, int key){
 
 // === TRAVERSALS ===
 
-void preOrder(Node* current){
+vector<int> preOrder(Node* current, vector<int> trav){
     if (current == nullptr){
-        return;
+        return trav;
     }
-    cout << current->getKey() << " ";
-    preOrder(current->getLeft());
-    preOrder(current->getRight());
+    trav.push_back(current->getKey());
+    trav = preOrder(current->getLeft(), trav);
+    trav = preOrder(current->getRight(), trav);
+
+    return trav;
 }
 
-void inOrder(Node* current){
+vector<int> inOrder(Node* current, vector<int> trav){
     if (current == nullptr){
-        return;
+        return trav;
     }
-    inOrder(current->getLeft());
-    cout << current->getKey() << " ";
-    inOrder(current->getRight());
+    trav = inOrder(current->getLeft(), trav);
+    trav.push_back(current->getKey());
+    trav = inOrder(current->getRight(), trav);
+
+    return trav;
 }
 
-void postOrder(Node* current){
+vector<int> postOrder(Node* current, vector<int> trav){
     if (current == nullptr){
-        return;
+        return trav;
     }
-    postOrder(current->getLeft());
-    postOrder(current->getRight());
-    cout << current->getKey() << " ";   
+    trav = postOrder(current->getLeft(), trav);
+    trav = postOrder(current->getRight(), trav);
+    trav.push_back(current->getKey());
+
+    return trav;
 }
 
 // === MAIN ===
@@ -351,10 +356,12 @@ int main(){
     Node* root = nullptr;
 
     // collecting input
+
     vector<string> values = {};
     input(&values);
 
     // inserting and deleting vals
+
     for (int i = 0; i < values.size(); i++){
 
         // insertion
@@ -368,14 +375,29 @@ int main(){
         }
     }
 
+    // traversing
+
+    vector<int> traversal;
     if (values[values.size()-1] == "PRE"){
-        preOrder(root);
+        traversal = preOrder(root, traversal);
     }
     else if (values[values.size()-1] == "IN"){
-        inOrder(root);
+        traversal = inOrder(root, traversal);
     }
     else if (values[values.size()-1] == "POST"){
-        postOrder(root);
+        traversal = postOrder(root, traversal);
+    }
+
+    // printing output
+
+    if (traversal.empty()){
+        cout << "EMPTY\n";
+    }
+    else {
+        for (int i = 0; i < traversal.size() - 1; i++){
+            cout << traversal[i] << " ";
+        }
+        cout << traversal[traversal.size()-1] << "\n";
     }
 
     return 0;
