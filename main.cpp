@@ -99,31 +99,31 @@ int heightOf(Node* node){
 }
 
 // right rotate
-Node* rightRotate(Node* y){
-    Node* x = y->getLeft();
-    Node* z = x->getRight();
+Node* rotateRight(Node* a){
+    Node* b = a->getLeft();
+    Node* c = b->getRight();
 
-    x->setRight(y);
-    y->setLeft(z);
+    b->setRight(a);
+    a->setLeft(c);
 
-    y->setHeight(max(heightOf(y->getLeft()), heightOf(y->getRight())) + 1);
-    x->setHeight(max(heightOf(x->getLeft()), heightOf(x->getRight())) + 1);
+    a->setHeight(max(heightOf(a->getLeft()), heightOf(a->getRight())) + 1);
+    b->setHeight(max(heightOf(b->getLeft()), heightOf(b->getRight())) + 1);
 
-    return x;
+    return b;
 }
 
 // left rotate
-Node* leftRotate(Node* x){
-    Node* y = x->getRight();
-    Node* z = y->getLeft();
+Node* rotateLeft(Node* a){
+    Node* b = a->getRight();
+    Node* c = b->getLeft();
 
-    y->setLeft(x);
-    x->setRight(z);
+    b->setLeft(a);
+    a->setRight(c);
 
-    x->setHeight(max(heightOf(x->getLeft()), heightOf(x->getRight())) + 1);
-    y->setHeight(max(heightOf(y->getLeft()), heightOf(y->getRight())) + 1);
+    a->setHeight(max(heightOf(a->getLeft()), heightOf(a->getRight())) + 1);
+    b->setHeight(max(heightOf(b->getLeft()), heightOf(b->getRight())) + 1);
 
-    return y;
+    return b;
 }
 
 // === INSERT ===
@@ -174,29 +174,146 @@ Node* insert(Node* current, int key){
 
     // left-left case
     if (balance > 1 && key < current->getLeft()->getKey()){
-        return rightRotate(current);
+        return rotateRight(current);
     }
 
     // right-right case
     if (balance < -1 && key > current->getRight()->getKey()){
-        return leftRotate(current);
+        return rotateLeft(current);
     }
 
     // left-right case
     if (balance > 1 && key > current->getLeft()->getKey()){
-        current->setLeft(leftRotate(current->getLeft()));
-        return rightRotate(current);
+        current->setLeft(rotateLeft(current->getLeft()));
+        return rotateRight(current);
     }
 
     // right-left case
     if (balance < -1 && key < current->getRight()->getKey()){
-        current->setRight(rightRotate(current->getRight()));
-        return leftRotate(current);
+        current->setRight(rotateRight(current->getRight()));
+        return rotateLeft(current);
     }
 
     // no rotation needed
     return current;
 
+}
+
+// === DELETE ===
+
+// always returns root node
+Node* deleteNode(Node* root, int key){
+
+    // traversing to find value recursively
+    // base case
+    if (root == nullptr){
+        return root;
+    }
+
+    // traversing
+    if (key < root->getKey()){
+        root->setLeft(deleteNode(root->getLeft(), key));
+    }
+    else if (key > root->getKey()){
+        root->setRight(deleteNode(root->getRight(), key));
+    }
+
+    // found value
+    else {
+        if ((root->getLeft() == nullptr) || root->getRight() == nullptr){
+            Node* temp = nullptr;
+            if (root->getLeft() != nullptr){
+                temp = root->getLeft();
+            }
+            else if (root->getRight() != nullptr){
+                temp = root->getRight();
+            }
+
+            // case where the node has no children
+            if (temp == nullptr){
+                temp = root;
+                root = nullptr;
+            }
+
+            // case where the node has a child
+            else {
+                delete root;
+                return temp;
+            }
+        }
+
+        // case where node has two children
+        else {
+            Node* temp = root->getRight();
+
+            while (temp->getLeft() != nullptr) {
+                temp = temp->getLeft();
+            }
+
+            root->setKey(temp->getKey());
+
+            root->setRight(deleteNode(root->getRight(), temp->getKey()));
+        }
+    }
+
+    // case where the tree only had one node
+    if (root == nullptr){
+        return root;
+    }
+
+    // update the height of the current node
+    if (root->getLeft() == nullptr){
+
+        // case where no children
+        if (root->getRight() == nullptr){
+            root->setHeight(1);
+        }
+
+        // case for right child only
+        else {
+            root->setHeight(1 + root->getRight()->getHeight());
+        }
+    }
+    else {
+
+        // case for left child only
+        if (root->getRight() == nullptr){
+            root->setHeight(1 + root->getLeft()->getHeight());
+        }
+
+        // case for two children
+        else {
+            root->setHeight(1 + max(root->getLeft()->getHeight(), root->getRight()->getHeight()));
+        }
+    }
+
+    // update the balance and rotate accordingly
+    int balance = root->getBalance();
+
+    // left left case
+    if (balance > 1 && (root->getLeft()->getBalance()) >= 0){
+        return rotateRight(root);
+    }
+
+    // left right case
+    if (balance > 1 && (root->getLeft()->getBalance()) < 0){
+        root->setLeft(rotateLeft(root->getLeft()));
+        return rotateRight(root);
+    }
+
+    // right right case
+    if (balance < -1 && (root->getRight()->getBalance()) <= 0){
+        return rotateLeft(root);
+    }
+
+    // right left case
+    if (balance < -1 && (root->getRight()->getBalance()) > 0){
+        root->setRight(rotateRight(root->getRight()));
+        return rotateLeft(root);
+    }
+
+    // no rotation needed
+    return root;
 }
 
 // === TRAVERSALS ===
@@ -231,22 +348,23 @@ void postOrder(Node* current){
 // === MAIN ===
 
 int main(){
-    Node* root = new Node();
+    Node* root = nullptr;
 
     // collecting input
     vector<string> values = {};
     input(&values);
 
-    // testing DELETE LATER
-    // for (int i = 0; i < values.size(); i++){
-    //     cout << values[i] << " - ";
-    // }
-    // cout << "\n";
-
-    // inserting the insert vals (NOT FINAL don't do it this order)
+    // inserting and deleting vals
     for (int i = 0; i < values.size(); i++){
+
+        // insertion
         if (values[i][0] == 'A'){
             root = insert(root, stoi(values[i].substr(1)));
+        }
+
+        // deletion
+        if (values[i][0] == 'D'){
+            root = deleteNode(root, stoi(values[i].substr(1)));
         }
     }
 
