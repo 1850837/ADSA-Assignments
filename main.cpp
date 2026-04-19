@@ -19,14 +19,14 @@ class Node{
             key = newKey;
             left = nullptr;
             right = nullptr;
-            height = 0;
+            height = 1;
         }
 
         Node(){
             key = -1;
             left = nullptr;
             right = nullptr;
-            height = 0;
+            height = 1;
         }
 
         // getters
@@ -47,10 +47,10 @@ class Node{
                 return 0;
             }
             if (getLeft() == nullptr){
-                return -1;
+                return (0 - getRight()->getHeight());
             }
             if (getRight() == nullptr) {
-                return 1;
+                return (getLeft()->getHeight());
             }
             return getLeft()->getHeight() - getRight()->getHeight();
         }
@@ -88,8 +88,47 @@ void input(vector<string>* values){
     return;
 }
 
+// === ROTATIONS ===
+
+// helper function to handle height with care for nullptrs
+int heightOf(Node* node){
+    if (node == nullptr){
+        return 0;
+    }
+    return node->getHeight();
+}
+
+// right rotate
+Node* rightRotate(Node* y){
+    Node* x = y->getLeft();
+    Node* z = x->getRight();
+
+    x->setRight(y);
+    y->setLeft(z);
+
+    y->setHeight(max(heightOf(y->getLeft()), heightOf(y->getRight())) + 1);
+    x->setHeight(max(heightOf(x->getLeft()), heightOf(x->getRight())) + 1);
+
+    return x;
+}
+
+// left rotate
+Node* leftRotate(Node* x){
+    Node* y = x->getRight();
+    Node* z = y->getLeft();
+
+    y->setLeft(x);
+    x->setRight(z);
+
+    x->setHeight(max(heightOf(x->getLeft()), heightOf(x->getRight())) + 1);
+    y->setHeight(max(heightOf(y->getLeft()), heightOf(y->getRight())) + 1);
+
+    return y;
+}
+
 // === INSERT ===
-// always returns the root
+
+// always returns the root node
 Node* insert(Node* current, int key){
     
     // base case
@@ -127,33 +166,33 @@ Node* insert(Node* current, int key){
     }
     else{
         newHeight = 1 + max(current->getLeft()->getHeight(), current->getRight()->getHeight());
-        current->setHeight(newHeight);
+    }
+    current->setHeight(newHeight);
+
+    // rebalancing
+    int balance = current->getBalance();
+
+    // left-left case
+    if (balance > 1 && key < current->getLeft()->getKey()){
+        return rightRotate(current);
     }
 
-    // // rebalancing
-    // int balance = current->getBalance();
+    // right-right case
+    if (balance < -1 && key > current->getRight()->getKey()){
+        return leftRotate(current);
+    }
 
-    // // left-left case
-    // if (balance > 1 && key < current->getLeft()->getKey()){
-    //     return rightRotate(current);
-    // }
+    // left-right case
+    if (balance > 1 && key > current->getLeft()->getKey()){
+        current->setLeft(leftRotate(current->getLeft()));
+        return rightRotate(current);
+    }
 
-    // // right-right case
-    // if (balance < -1 && key > current->getRight()->getKey()){
-    //     return leftRotate(current);
-    // }
-
-    // // left-right case
-    // if (balance > 1 && key > current->getLeft()->getKey()){
-    //     current->setLeft(leftRotate(current->getLeft()));
-    //     return rightRotate(current);
-    // }
-
-    // // right-left case
-    // if (balance < -1 && key < current->getRight()->getKey()){
-    //     current->setRight(rightRotate(current->getRight()));
-    //     return leftRotate(current);
-    // }
+    // right-left case
+    if (balance < -1 && key < current->getRight()->getKey()){
+        current->setRight(rightRotate(current->getRight()));
+        return leftRotate(current);
+    }
 
     // no rotation needed
     return current;
