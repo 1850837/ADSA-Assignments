@@ -101,13 +101,9 @@ int main() {
 
     // testing
 
-    double result = solve_part1(mat);
+    double result1 = solve_part1(mat);
 
-    std::cout << "Expecting: 0.648. Recieved: ";
-
-    std::cout << result;
-
-    std::cout << "\n";
+    std::cout << "PART1: " << result1 << "\n";
 
     return 0;
 }
