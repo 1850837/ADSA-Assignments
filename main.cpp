@@ -17,8 +17,8 @@ double solve_part1(const std::vector<std::vector<double>>& M){
 
     // Create a while loop that continues while there are unvisited nodes
     auto it = find(visited.begin(), visited.end(), false);
-    double current_prob = 0;
-    int current = 0;
+    double current_prob = -1;
+    int current = -1;
     while (it != visited.end()){
 
         // Choosing a current vertex
@@ -31,6 +31,11 @@ double solve_part1(const std::vector<std::vector<double>>& M){
                     current = i;
                 }
             }
+        }
+
+        // Handle the case where there are unreachable nodes
+        if (current == -1 || current_prob < 0) {
+            break;
         }
 
         // Check all the neighbouring verticies, calculating the new prob and updating it if it's greater
@@ -57,8 +62,8 @@ double solve_part1(const std::vector<std::vector<double>>& M){
         it = find(visited.begin(), visited.end(), false);
 
         // Resetting current and current_prob
-        current = 0;
-        current_prob = 0;
+        current = -1;
+        current_prob = -1;
     }
 
     return probabilities.back();
@@ -166,6 +171,15 @@ void cut_edge(int level, std::vector<std::vector<double>> M, std::vector<std::pa
     double prob = dij.back();
     dij.pop_back();
 
+    // // Handling cases where prob = 0 before all three paths have been cut
+    // if (prob <= 0) {
+    //     if (0 < current_prob) {
+    //         current_prob = 0;
+    //         pairs = current_pairs;
+    //     }
+    //     return;
+    // }
+
     // Convert path nodes to integers
     std::vector<int> dij_int;
     for (int i = 0; i < dij.size(); i++) {
@@ -173,13 +187,13 @@ void cut_edge(int level, std::vector<std::vector<double>> M, std::vector<std::pa
     }
     std::vector<std::pair<int,int>> best_path = become_pairs(dij_int);
 
-    // Finding a third edge even if the prob is 0
+    // Finding another edge even if the prob is 0
     if (prob <= 0 || best_path.empty()) {
         bool found_edge = false;
-        // Find ANY remaining edge in the graph that isn't 0
+
         for (int i = 0; i < M.size() && !found_edge; i++) {
             for (int j = 0; j < M.size(); j++) {
-                if (M[i][j] > 0) {
+                if (M[i][j] > 0 && i != j) {
                     std::vector<std::vector<double>> M2 = M;
                     M2[i][j] = 0;
                     std::vector<std::pair<int, int>> current_pairs2 = current_pairs;
@@ -203,6 +217,8 @@ void cut_edge(int level, std::vector<std::vector<double>> M, std::vector<std::pa
         
         cut_edge(level + 1, M2, current_pairs2);
     }
+
+    return;
 }
 
 // Writes exactly 3 chosen edges (1-indexed) into edges_out.
